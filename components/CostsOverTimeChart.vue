@@ -6,36 +6,52 @@
 /* global echarts */
 
 export default {
+  props: {
+    data: {
+      required: true,
+      type: Array,
+    },
+
+    scenario: {
+      required: true,
+      type: Object,
+    },
+  },
+
   data() {
+    const currentYear = new Date().getFullYear()
+
+    const series = [
+      {
+        data: this.data.map((c) => c.amount),
+        name: `${this.scenario.name} repayment`,
+        stack: this.scenario.key,
+        type: 'line',
+        areaStyle: {},
+      },
+      {
+        data: this.data.map((c) => c.interest),
+        name: `${this.scenario.name} interest`,
+        stack: this.scenario.key,
+        type: 'line',
+        areaStyle: {},
+      },
+    ]
+
     return {
       chart: null,
 
       chartOptions: {
-        title: {
-          text: 'ECharts entry example',
-        },
-        tooltip: {},
-        legend: {
-          data: ['Sales'],
+        series,
+        tooltip: {
+          trigger: 'axis',
         },
         xAxis: {
-          data: [
-            'shirt',
-            'cardign',
-            'chiffon shirt',
-            'pants',
-            'heels',
-            'socks',
-          ],
+          boundaryGap: false,
+          data: this.data.map((c) => currentYear + c.year),
+          type: 'category',
         },
         yAxis: {},
-        series: [
-          {
-            name: 'Sales',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20],
-          },
-        ],
       },
     }
   },

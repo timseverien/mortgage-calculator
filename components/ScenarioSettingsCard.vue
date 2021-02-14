@@ -76,6 +76,11 @@ export default {
       type: String,
     },
 
+    period: {
+      required: true,
+      type: Number,
+    },
+
     type: {
       default: 'linear',
       type: String,
@@ -112,10 +117,19 @@ export default {
 
     interestRateModel: {
       get() {
-        return this.interestRate.toString()
+        return (100 * this.interestRate).toString()
       },
       set(value) {
-        this.$emit('change:interestRate', Number.parseFloat(value))
+        this.$emit('change:interestRate', Number.parseFloat(value) / 100)
+      },
+    },
+
+    periodModel: {
+      get() {
+        return this.period.toString()
+      },
+      set(value) {
+        this.$emit('change:period', Number.parseFloat(value))
       },
     },
 

@@ -21,14 +21,20 @@
             @change:interestRate="
               handleScenarioChange(scenario, 'interestRate', $event)
             "
+            @change:period="handleScenarioChange(scenario, 'period', $event)"
           />
         </b-card-group>
       </b-col>
     </b-row>
 
+    <h2>What will it cost me?</h2>
+
     <b-row class="section">
-      <b-col>
-        <CostsOverTimeChart />
+      <b-col v-for="scenario in scenarios" :key="scenario.key">
+        <CostsOverTimeChart
+          :scenario="scenario"
+          :data="getCostsOverTime(scenario)"
+        />
       </b-col>
     </b-row>
   </b-container>
@@ -51,10 +57,51 @@ export default {
       return {
         key: `scenario-${index}`,
         name: `Scenario ${index + 1}`,
-        amount: 30000,
-        fixedRatePeriod: 10,
-        interestRate: 1.5,
+        amount: 300000,
+        fixedRatePeriod: 10 + index * 10,
+        interestRate: 0.015,
+        interestRateAfterFixedRatePeriod: 0.02,
+        period: 30,
+        type: 'linear',
       }
+    },
+
+    getAnnuityCostsOvertime(scenario) {
+      return []
+    },
+
+    getCostsOverTime(scenario) {
+      switch (scenario.type) {
+        case 'annuity':
+          return this.getAnnuityCostsOvertime(scenario)
+        case 'linear':
+          return this.getLinearCostsOvertime(scenario)
+      }
+
+      return null
+    },
+
+    getLinearCostsOvertime(scenario) {
+      const amountPerYear = scenario.amount / scenario.period
+
+      const costsPerYear = new Array(scenario.period)
+        .fill()
+        .map((_, yearIndex) => {
+          const amount = amountPerYear
+          const year = yearIndex
+
+          const interestRate =
+            yearIndex < scenario.fixedRatePeriod
+              ? scenario.interestRate
+              : scenario.interestRateAfterFixedRatePeriod
+
+          const interest =
+            (scenario.period - yearIndex) * amountPerYear * interestRate
+
+          return { amount, interest, year }
+        })
+
+      return costsPerYear
     },
 
     handleScenarioChange(scenario, key, value) {
