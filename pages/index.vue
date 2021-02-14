@@ -21,6 +21,13 @@
             @change:interestRate="
               handleScenarioChange(scenario, 'interestRate', $event)
             "
+            @change:interestRateAfterFixedRatePeriod="
+              handleScenarioChange(
+                scenario,
+                'interestRateAfterFixedRatePeriod',
+                $event
+              )
+            "
             @change:period="handleScenarioChange(scenario, 'period', $event)"
           />
         </b-card-group>

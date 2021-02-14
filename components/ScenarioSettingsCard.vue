@@ -49,6 +49,21 @@
           />
         </b-input-group>
       </b-form-group>
+      <b-form-group
+        :label-for="`scenario-${_uid}-interest-rate-after-fixed-rate-period`"
+        label="Interest rate after fixed-rate period"
+      >
+        <b-input-group append="%">
+          <b-form-input
+            :id="`scenario-${_uid}-interest-rate-after-fixed-rate-period`"
+            v-model="interestRateAfterFixedRatePeriodModel"
+            max="100"
+            min="0"
+            step="0.01"
+            type="number"
+          />
+        </b-input-group>
+      </b-form-group>
     </b-form>
   </b-card>
 </template>
@@ -67,6 +82,11 @@ export default {
     },
 
     interestRate: {
+      required: true,
+      type: Number,
+    },
+
+    interestRateAfterFixedRatePeriod: {
       required: true,
       type: Number,
     },
@@ -121,6 +141,18 @@ export default {
       },
       set(value) {
         this.$emit('change:interestRate', Number.parseFloat(value) / 100)
+      },
+    },
+
+    interestRateAfterFixedRatePeriodModel: {
+      get() {
+        return (100 * this.interestRateAfterFixedRatePeriod).toString()
+      },
+      set(value) {
+        this.$emit(
+          'change:interestRateAfterFixedRatePeriod',
+          Number.parseFloat(value) / 100
+        )
       },
     },
 

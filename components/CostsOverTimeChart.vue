@@ -21,28 +21,11 @@ export default {
   data() {
     const currentYear = new Date().getFullYear()
 
-    const series = [
-      {
-        data: this.data.map((c) => c.amount),
-        name: `${this.scenario.name} repayment`,
-        stack: this.scenario.key,
-        type: 'line',
-        areaStyle: {},
-      },
-      {
-        data: this.data.map((c) => c.interest),
-        name: `${this.scenario.name} interest`,
-        stack: this.scenario.key,
-        type: 'line',
-        areaStyle: {},
-      },
-    ]
-
     return {
       chart: null,
 
       chartOptions: {
-        series,
+        series: this.createSeries(),
         tooltip: {
           trigger: 'axis',
         },
@@ -56,6 +39,14 @@ export default {
     }
   },
 
+  watch: {
+    data() {
+      this.chart.setOption({
+        series: this.createSeries(),
+      })
+    },
+  },
+
   mounted() {
     if (!this.$isServer) {
       this.createChart(this.$refs.container)
@@ -67,6 +58,27 @@ export default {
       this.chart = echarts.init(container)
 
       this.chart.setOption(this.chartOptions)
+    },
+
+    createSeries() {
+      return [
+        {
+          areaStyle: {},
+          data: this.data.map((c) => c.amount),
+          name: 'Repayment',
+          showSymbol: false,
+          stack: 'total',
+          type: 'line',
+        },
+        {
+          areaStyle: {},
+          data: this.data.map((c) => c.interest),
+          name: 'Interest',
+          showSymbol: false,
+          stack: 'total',
+          type: 'line',
+        },
+      ]
     },
   },
 }
