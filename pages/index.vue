@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <div class="page">
     <b-row class="section">
       <b-col>
         <h1>Mortgage calculator</h1>
@@ -37,14 +37,19 @@
     <h2>What will it cost me?</h2>
 
     <b-row class="section">
-      <b-col v-for="scenario in scenarios" :key="scenario.key">
+      <b-col v-for="scenario in scenarioCosts" :key="scenario.key">
         <CostsOverTimeChart
           :scenario="scenario"
-          :data="getCostsOverTime(scenario)"
+          :data="scenario.costsOvertime"
         />
+
+        <dl>
+          <dt>Total costs</dt>
+          <dd>{{ scenario.totalFormatted }}</dd>
+        </dl>
       </b-col>
     </b-row>
-  </b-container>
+  </div>
 </template>
 
 <script>
@@ -57,6 +62,28 @@ export default {
         this.createScenario(2),
       ],
     }
+  },
+
+  computed: {
+    scenarioCosts() {
+      const costsFormatter = new Intl.NumberFormat(undefined, {
+        currency: 'EUR',
+        style: 'currency',
+      })
+
+      return this.scenarios.map((scenario) => {
+        const costsOvertime = this.getCostsOverTime(scenario)
+        const total = costsOvertime.reduce(
+          (sum, costs) => sum + costs.amount + costs.interest,
+          0
+        )
+
+        return {
+          costsOvertime,
+          totalFormatted: costsFormatter.format(total),
+        }
+      })
+    },
   },
 
   methods: {
@@ -119,6 +146,10 @@ export default {
 </script>
 
 <style scoped>
+.page {
+  padding: 1rem;
+}
+
 .section {
   margin-bottom: 1rem;
 }

@@ -14,12 +14,12 @@ export default {
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    script: [
-      {
-        hid: 'echarts',
-        src: 'https://unpkg.com/echarts@5.0.2/dist/echarts.js',
-      },
-    ],
+    // script: [
+    //   {
+    //     hid: 'echarts',
+    //     src: 'https://unpkg.com/echarts@5.0.2/dist/echarts.js',
+    //   },
+    // ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -47,4 +47,8 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  server: {
+    port: 3005,
+  },
 }

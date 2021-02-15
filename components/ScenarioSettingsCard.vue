@@ -5,11 +5,34 @@
     </template>
 
     <b-form>
-      <b-form-group :label-for="`scenario-${_uid}-type`" label="Type">
+      <b-form-group
+        :label-for="`scenario-${_uid}-type`"
+        content-cols="8"
+        label-cols="4"
+        label="Type"
+      >
         <b-form-select v-model="typeModel" :options="typeOptions" />
       </b-form-group>
       <b-form-group
+        :label-for="`scenario-${_uid}-amount`"
+        content-cols="8"
+        label-cols="4"
+        label="Amount"
+      >
+        <b-input-group prepend="€">
+          <b-form-input
+            :id="`scenario-${_uid}-amount`"
+            v-model="amountModel"
+            min="1"
+            step="1"
+            type="number"
+          />
+        </b-input-group>
+      </b-form-group>
+      <b-form-group
         :label-for="`scenario-${_uid}-fixed-rate-period`"
+        content-cols="8"
+        label-cols="4"
         label="Fixed-rate period"
       >
         <b-input-group append="years">
@@ -23,19 +46,10 @@
           />
         </b-input-group>
       </b-form-group>
-      <b-form-group :label-for="`scenario-${_uid}-amount`" label="Amount">
-        <b-input-group prepend="€">
-          <b-form-input
-            :id="`scenario-${_uid}-amount`"
-            v-model="amountModel"
-            min="1"
-            step="1"
-            type="number"
-          />
-        </b-input-group>
-      </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-interest-rate`"
+        content-cols="8"
+        label-cols="4"
         label="Interest rate"
       >
         <b-input-group append="%">
@@ -51,6 +65,8 @@
       </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-interest-rate-after-fixed-rate-period`"
+        content-cols="8"
+        label-cols="4"
         label="Interest rate after fixed-rate period"
       >
         <b-input-group append="%">
