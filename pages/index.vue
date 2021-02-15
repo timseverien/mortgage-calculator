@@ -44,6 +44,9 @@
         />
 
         <dl>
+          <dt>Total interest</dt>
+          <dd>{{ scenario.totalInterestFormatted }}</dd>
+
           <dt>Total costs</dt>
           <dd>{{ scenario.totalFormatted }}</dd>
         </dl>
@@ -53,14 +56,22 @@
 </template>
 
 <script>
+const periodsPerYear = 12
+
+function createFormattedDateFromPeriod(period) {
+  const currentYear = new Date().getFullYear()
+  const year = (currentYear + Math.floor(period / 12))
+    .toString()
+    .padStart(4, '0')
+  const month = ((period % 12) + 1).toString().padStart(2, '0')
+
+  return `${year}-${month}`
+}
+
 export default {
   data() {
     return {
-      scenarios: [
-        this.createScenario(0),
-        this.createScenario(1),
-        this.createScenario(2),
-      ],
+      scenarios: [this.createScenario(0), this.createScenario(1)],
     }
   },
 
@@ -68,19 +79,28 @@ export default {
     scenarioCosts() {
       const costsFormatter = new Intl.NumberFormat(undefined, {
         currency: 'EUR',
+        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
         style: 'currency',
       })
 
       return this.scenarios.map((scenario) => {
         const costsOvertime = this.getCostsOverTime(scenario)
+
         const total = costsOvertime.reduce(
           (sum, costs) => sum + costs.amount + costs.interest,
+          0
+        )
+
+        const totalInterest = costsOvertime.reduce(
+          (sum, costs) => sum + costs.interest,
           0
         )
 
         return {
           costsOvertime,
           totalFormatted: costsFormatter.format(total),
+          totalInterestFormatted: costsFormatter.format(totalInterest),
         }
       })
     },
@@ -96,12 +116,37 @@ export default {
         interestRate: 0.015,
         interestRateAfterFixedRatePeriod: 0.02,
         period: 30,
-        type: 'linear',
+        type: index % 2 === 0 ? 'linear' : 'annuity',
       }
     },
 
+    // https://www.investopedia.com/terms/p/present-value-annuity.asp
+    // https://superuser.com/a/871411
     getAnnuityCostsOvertime(scenario) {
-      return []
+      const costsPerMonth = []
+      const interestPeriods = periodsPerYear * scenario.period
+      const periodicInterestRate = scenario.interestRate / periodsPerYear
+
+      const monthlyPayment =
+        (scenario.amount * periodicInterestRate) /
+        (1 - Math.pow(1 + periodicInterestRate, -interestPeriods))
+
+      let debt = scenario.amount
+
+      for (let i = 0; i < periodsPerYear * scenario.period; i++) {
+        const interest = (scenario.interestRate / periodsPerYear) * debt
+        const amount = monthlyPayment - interest
+
+        debt -= amount
+
+        costsPerMonth.push({
+          amount,
+          interest,
+          period: createFormattedDateFromPeriod(i),
+        })
+      }
+
+      return costsPerMonth
     },
 
     getCostsOverTime(scenario) {
@@ -116,26 +161,31 @@ export default {
     },
 
     getLinearCostsOvertime(scenario) {
+      const costsPerMonth = []
       const amountPerYear = scenario.amount / scenario.period
 
-      const costsPerYear = new Array(scenario.period)
-        .fill()
-        .map((_, yearIndex) => {
-          const amount = amountPerYear
-          const year = yearIndex
+      const amountPerMonth = amountPerYear / periodsPerYear
 
-          const interestRate =
-            yearIndex < scenario.fixedRatePeriod
-              ? scenario.interestRate
-              : scenario.interestRateAfterFixedRatePeriod
+      for (let i = 0; i < periodsPerYear * scenario.period; i++) {
+        const amount = amountPerMonth
+        const year = Math.floor(i / periodsPerYear)
 
-          const interest =
-            (scenario.period - yearIndex) * amountPerYear * interestRate
+        const interestRate =
+          (year < scenario.fixedRatePeriod
+            ? scenario.interestRate
+            : scenario.interestRateAfterFixedRatePeriod) / periodsPerYear
 
-          return { amount, interest, year }
+        const interest =
+          (periodsPerYear * scenario.period - i) * amountPerMonth * interestRate
+
+        costsPerMonth.push({
+          amount,
+          interest,
+          period: createFormattedDateFromPeriod(i),
         })
+      }
 
-      return costsPerYear
+      return costsPerMonth
     },
 
     handleScenarioChange(scenario, key, value) {
