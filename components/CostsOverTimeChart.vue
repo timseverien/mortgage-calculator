@@ -72,6 +72,9 @@ export default {
             const total = params.reduce((sum, param) => sum + param.data, 0)
 
             return `<div class="chart-tooltip">
+              <div>Period</div>
+              <b>${params[0].axisValue}</b>
+
               ${series}
               <div>Total</div>
               <b>${costsFormatter.format(total)}</b>
@@ -94,8 +97,11 @@ export default {
 
   watch: {
     data() {
+      const { legend, series } = this.createSeries()
+
       this.chart.setOption({
-        series: this.createSeries(),
+        legend: { data: legend },
+        series,
       })
     },
   },

@@ -7,48 +7,53 @@
     </b-row>
 
     <b-row class="section">
-      <b-col>
-        <b-card-group deck>
-          <ScenarioSettingsCard
-            v-for="scenario in scenarios"
-            v-bind="scenario"
-            :key="scenario.key"
-            :name="scenario.name"
-            @change:amount="handleScenarioChange(scenario, 'amount', $event)"
-            @change:fixedRatePeriod="
-              handleScenarioChange(scenario, 'fixedRatePeriod', $event)
-            "
-            @change:interestRate="
-              handleScenarioChange(scenario, 'interestRate', $event)
-            "
-            @change:interestRateAfterFixedRatePeriod="
-              handleScenarioChange(
-                scenario,
-                'interestRateAfterFixedRatePeriod',
-                $event
-              )
-            "
-            @change:period="handleScenarioChange(scenario, 'period', $event)"
-          />
-        </b-card-group>
+      <b-col v-for="scenario in scenarios" :key="scenario.key" cols="12" lg="6">
+        <ScenarioSettingsCard
+          v-bind="scenario"
+          :name="scenario.name"
+          @change:amount="handleScenarioChange(scenario, 'amount', $event)"
+          @change:fixedRatePeriod="
+            handleScenarioChange(scenario, 'fixedRatePeriod', $event)
+          "
+          @change:interestRate="
+            handleScenarioChange(scenario, 'interestRate', $event)
+          "
+          @change:interestRateAfterFixedRatePeriod="
+            handleScenarioChange(
+              scenario,
+              'interestRateAfterFixedRatePeriod',
+              $event
+            )
+          "
+          @change:period="handleScenarioChange(scenario, 'period', $event)"
+        />
       </b-col>
     </b-row>
 
     <h2>What will it cost me?</h2>
 
     <b-row class="section">
-      <b-col v-for="scenario in scenarioCosts" :key="scenario.key">
+      <b-col
+        v-for="scenario in scenarioCosts"
+        :key="scenario.key"
+        cols="12"
+        lg="6"
+      >
         <CostsOverTimeChart
           :scenario="scenario"
           :data="scenario.costsOvertime"
         />
 
-        <dl>
-          <dt>Total interest</dt>
-          <dd>{{ scenario.totalInterestFormatted }}</dd>
+        <dl class="summary">
+          <div>
+            <dt>Total interest</dt>
+            <dd>{{ scenario.totalInterestFormatted }}</dd>
+          </div>
 
-          <dt>Total costs</dt>
-          <dd>{{ scenario.totalFormatted }}</dd>
+          <div>
+            <dt>Total costs</dt>
+            <dd>{{ scenario.totalFormatted }}</dd>
+          </div>
         </dl>
       </b-col>
     </b-row>
@@ -112,7 +117,7 @@ export default {
         key: `scenario-${index}`,
         name: `Scenario ${index + 1}`,
         amount: 300000,
-        fixedRatePeriod: 10 + index * 10,
+        fixedRatePeriod: 10,
         interestRate: 0.015,
         interestRateAfterFixedRatePeriod: 0.02,
         period: 30,
@@ -125,25 +130,56 @@ export default {
     getAnnuityCostsOvertime(scenario) {
       const costsPerMonth = []
       const interestPeriods = periodsPerYear * scenario.period
-      const periodicInterestRate = scenario.interestRate / periodsPerYear
+      const interestRatePerMonth = scenario.interestRate / periodsPerYear
 
       const monthlyPayment =
-        (scenario.amount * periodicInterestRate) /
-        (1 - Math.pow(1 + periodicInterestRate, -interestPeriods))
+        (scenario.amount * interestRatePerMonth) /
+        (1 - Math.pow(1 + interestRatePerMonth, -interestPeriods))
 
       let debt = scenario.amount
 
-      for (let i = 0; i < periodsPerYear * scenario.period; i++) {
-        const interest = (scenario.interestRate / periodsPerYear) * debt
+      for (let i = 0; i < periodsPerYear * scenario.fixedRatePeriod; i++) {
+        const interest = interestRatePerMonth * debt
         const amount = monthlyPayment - interest
-
-        debt -= amount
 
         costsPerMonth.push({
           amount,
           interest,
           period: createFormattedDateFromPeriod(i),
         })
+
+        debt -= amount
+      }
+
+      const interestPeriodsAfterFixedRatePeriod =
+        periodsPerYear * (scenario.period - scenario.fixedRatePeriod)
+
+      const interestRatePerMonthAfterFixedRatePeriod =
+        scenario.interestRateAfterFixedRatePeriod / periodsPerYear
+
+      const monthlyPaymentAfterFixedRatePeriod =
+        (debt * interestRatePerMonthAfterFixedRatePeriod) /
+        (1 -
+          Math.pow(
+            1 + interestRatePerMonthAfterFixedRatePeriod,
+            -interestPeriodsAfterFixedRatePeriod
+          ))
+
+      for (
+        let i = periodsPerYear * scenario.fixedRatePeriod;
+        i < periodsPerYear * scenario.period;
+        i++
+      ) {
+        const interest = interestRatePerMonthAfterFixedRatePeriod * debt
+        const amount = monthlyPaymentAfterFixedRatePeriod - interest
+
+        costsPerMonth.push({
+          amount,
+          interest,
+          period: createFormattedDateFromPeriod(i),
+        })
+
+        debt -= amount
       }
 
       return costsPerMonth
@@ -202,5 +238,10 @@ export default {
 
 .section {
   margin-bottom: 1rem;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
 }
 </style>
