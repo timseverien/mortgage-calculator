@@ -2,6 +2,10 @@ export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
 
+  router: {
+    base: '/mortgage-calculator/',
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Mortgage calculator',
@@ -13,12 +17,6 @@ export default {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
     ],
-    // script: [
-    //   {
-    //     hid: 'echarts',
-    //     src: 'https://unpkg.com/echarts@5.0.2/dist/echarts.js',
-    //   },
-    // ],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css

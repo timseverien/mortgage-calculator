@@ -7,16 +7,20 @@
     <b-form>
       <b-form-group
         :label-for="`scenario-${_uid}-type`"
-        content-cols="8"
-        label-cols="4"
+        content-cols-lg="8"
+        content-cols-md="6"
+        label-cols-lg="4"
+        label-cols-md="6"
         label="Type"
       >
         <b-form-select v-model="typeModel" :options="typeOptions" />
       </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-amount`"
-        content-cols="8"
-        label-cols="4"
+        content-cols-lg="8"
+        content-cols-md="6"
+        label-cols-lg="4"
+        label-cols-md="6"
         label="Amount"
       >
         <b-input-group prepend="€">
@@ -31,8 +35,10 @@
       </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-fixed-rate-period`"
-        content-cols="8"
-        label-cols="4"
+        content-cols-lg="8"
+        content-cols-md="6"
+        label-cols-lg="4"
+        label-cols-md="6"
         label="Fixed-rate period"
       >
         <b-input-group append="years">
@@ -48,8 +54,10 @@
       </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-interest-rate`"
-        content-cols="8"
-        label-cols="4"
+        content-cols-lg="8"
+        content-cols-md="6"
+        label-cols-lg="4"
+        label-cols-md="6"
         label="Interest rate"
       >
         <b-input-group append="%">
@@ -65,8 +73,10 @@
       </b-form-group>
       <b-form-group
         :label-for="`scenario-${_uid}-interest-rate-after-fixed-rate-period`"
-        content-cols="8"
-        label-cols="4"
+        content-cols-lg="8"
+        content-cols-md="6"
+        label-cols-lg="4"
+        label-cols-md="6"
         label="Interest rate after fixed-rate period"
       >
         <b-input-group append="%">

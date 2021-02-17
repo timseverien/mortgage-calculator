@@ -7,7 +7,13 @@
     </b-row>
 
     <b-row class="section">
-      <b-col v-for="scenario in scenarios" :key="scenario.key" cols="12" lg="6">
+      <b-col
+        v-for="scenario in scenarios"
+        :key="scenario.key"
+        class="card-container"
+        cols="12"
+        lg="6"
+      >
         <ScenarioSettingsCard
           v-bind="scenario"
           :name="scenario.name"
@@ -243,5 +249,9 @@ export default {
 .summary {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
+}
+
+.card-container {
+  margin-bottom: 1rem;
 }
 </style>
