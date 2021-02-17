@@ -72,8 +72,8 @@ export default {
             const total = params.reduce((sum, param) => sum + param.data, 0)
 
             return `<div class="chart-tooltip">
-              <div>Period</div>
               <b>${params[0].axisValue}</b>
+              <div></div>
 
               ${series}
               <div>Total</div>
